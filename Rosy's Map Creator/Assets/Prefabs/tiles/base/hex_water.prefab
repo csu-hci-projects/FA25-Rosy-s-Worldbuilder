@@ -12,9 +12,7 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: 7325635701663125642}
-  - component: {fileID: -2252156481001588690}
   - component: {fileID: 8152164865987161566}
-  - component: {fileID: 1811695328429789406}
   m_Layer: 6
   m_Name: hex_water
   m_TagString: HexTile
@@ -68,7 +66,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 958ae798dc002f743b86fc6da43e9c83, type: 2}
+  - {fileID: 2100000, guid: 55e6e9d4e1e9701409e76f8921510254, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -112,18 +110,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1477051960566787356, guid: 652a8086019dbda40b426a0e76dc8c64, type: 3}
---- !u!114 &-2252156481001588690
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!64 &8152164865987161566
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -146,15 +132,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1477051960566787356, guid: 652a8086019dbda40b426a0e76dc8c64, type: 3}
---- !u!114 &1811695328429789406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -12,9 +12,7 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: 4398126671739272195}
-  - component: {fileID: -2240437552294610679}
   - component: {fileID: 4551036875763366272}
-  - component: {fileID: 543672315901357914}
   m_Layer: 6
   m_Name: hex_grass_sloped_low
   m_TagString: HexTile
@@ -112,18 +110,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 6427449192570835744, guid: 3547eecba08e7ff4e86a2dc8bec0caed, type: 3}
---- !u!114 &-2240437552294610679
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!64 &4551036875763366272
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -146,15 +132,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 6427449192570835744, guid: 3547eecba08e7ff4e86a2dc8bec0caed, type: 3}
---- !u!114 &543672315901357914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: 5510293888975220871}
-  - component: {fileID: 9110425539623689609}
   m_Layer: 6
   m_Name: hex_road_K
   m_TagString: HexTile
@@ -110,15 +109,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 1413749688576608404, guid: 64fa0c32c626bc64fa81a3e06f3f7a20, type: 3}
---- !u!114 &9110425539623689609
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

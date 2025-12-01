@@ -12,9 +12,7 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: 1927770230263750086}
-  - component: {fileID: -4335890446236412518}
   - component: {fileID: -4956092269771435747}
-  - component: {fileID: 8708509559965788390}
   m_Layer: 6
   m_Name: hex_transition
   m_TagString: HexTile
@@ -113,18 +111,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 652679810327166486, guid: dc5b24a574d2266448075c5e33806d50, type: 3}
---- !u!114 &-4335890446236412518
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!64 &-4956092269771435747
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -147,15 +133,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 652679810327166486, guid: dc5b24a574d2266448075c5e33806d50, type: 3}
---- !u!114 &8708509559965788390
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

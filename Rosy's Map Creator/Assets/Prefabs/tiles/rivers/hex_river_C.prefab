@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: -6561153526566165657}
-  - component: {fileID: 4448929460920087685}
   m_Layer: 6
   m_Name: hex_river_C
   m_TagString: HexTile
@@ -110,15 +109,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 2415901218861293591, guid: f7bd8c1b010c7454ca2455f09ac1df0a, type: 3}
---- !u!114 &4448929460920087685
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

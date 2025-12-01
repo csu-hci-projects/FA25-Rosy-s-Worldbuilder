@@ -135,6 +135,13 @@ public class PlacementManager : MonoBehaviour
                 {
                     placed.transform.SetParent(worldState.transform, true);
                 }
+                int gridX = cellPosition.x;
+                int gridZ = cellPosition.y; 
+                int layerIndex = Mathf.RoundToInt(previewPos.y * 2 - 1);
+
+                TileData tileData = placed.AddComponent<TileData>();
+                tileData.SetTileCoordinates(new Vector3(gridX, layerIndex, gridZ));
+
                 placedObjects.Add(placed);
             }
             else if (currentPlacementMode == PlacementMode.Delete)

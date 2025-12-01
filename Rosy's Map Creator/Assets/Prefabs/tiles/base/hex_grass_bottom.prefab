@@ -12,9 +12,7 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: -4636135801634561941}
-  - component: {fileID: 9013946754498781757}
   - component: {fileID: 5634149512167325780}
-  - component: {fileID: -3485174142842713357}
   m_Layer: 6
   m_Name: hex_grass_bottom
   m_TagString: HexTile
@@ -112,18 +110,6 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8813561414564324708, guid: 37f437d77b8257042a8e8769cc202174, type: 3}
---- !u!114 &9013946754498781757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!64 &5634149512167325780
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -146,15 +132,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8813561414564324708, guid: 37f437d77b8257042a8e8769cc202174, type: 3}
---- !u!114 &-3485174142842713357
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149155446097}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5e6a7511e217b34e986f9ec9890735e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
