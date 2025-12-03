@@ -7,15 +7,22 @@ using UnityEngine.EventSystems;
 
 public class CameraController : MonoBehaviour
 {
-
     public float nomralSpeed;
     public float fastSpeed;
     public float movementSpeed;
     public float movementTime;
     public float rotationAmount;
     public Vector3 zoomAmount;
-    public float dragSpeed = 1f; // multiplier for middle-button panning
+    public float dragSpeed = 1f;       // multiplier for middle-button panning
     public float dragRotateSpeed = 1f; // multiplier for right-button rotation
+
+    // --- Click-to-follow settings ---
+    [Header("Click To Follow")]
+    public LayerMask selectableLayers;      // set in Inspector
+    public bool clickToToggleFollow = true; // click same target again to stop following
+
+    private Transform followTarget = null;
+    private Vector3 followOffset = Vector3.zero;
 
     // internal drag state
     private bool isMiddleDragging = false;
@@ -35,16 +42,77 @@ public class CameraController : MonoBehaviour
         newZoom = Camera.main.transform.localPosition;
     }
 
-    // Update is called once per frame
     void Update()
     {
+        HandleClickToFollow();
         HandleMovementInput();
     }
 
+    void HandleClickToFollow()
+    {
+        var mouse = Mouse.current;
+        if (mouse == null) return;
+
+        if (mouse.leftButton.wasPressedThisFrame)
+        {
+            // Ignore clicks on UI
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                return;
+
+            Ray ray = Camera.main.ScreenPointToRay(mouse.position.ReadValue());
+            RaycastHit hit;
+
+            // No layer mask — just raycast everything
+            if (Physics.Raycast(ray, out hit, 1000f))
+            {
+                // Check tag instead of layer
+                if (hit.transform.CompareTag("Units"))
+                {
+                    // If clicking same target, toggle off
+                    if (followTarget == hit.transform && clickToToggleFollow)
+                    {
+                        followTarget = null;
+                        return;
+                    }
+
+                    followTarget = hit.transform;
+                    followOffset = newPosition - followTarget.position;
+
+                    followTarget.GetComponent<UnitController>()?.Selected();
+                }
+                else
+                {
+                    // Clicked something without the tag → stop following (optional)
+                    if (clickToToggleFollow)
+                    {
+                        followTarget.GetComponent<UnitController>()?.Deselect();
+                        followTarget = null;
+                    }
+                }
+            }
+            else
+            {
+                // Clicked empty space → stop following (optional)
+                if (clickToToggleFollow)
+                {
+                    followTarget?.GetComponent<UnitController>()?.Deselect();
+                    followTarget = null;
+                }
+            }
+        }
+    }
+
+    // ---------------- MAIN MOVEMENT ----------------
     void HandleMovementInput()
     {
         Vector3 direction = Vector3.zero;
         var mouse = Mouse.current;
+
+        // If we are following something, lock position to it each frame
+        if (followTarget != null)
+        {
+            newPosition = followTarget.position + followOffset;
+        }
 
         // --- Mouse handling: middle-click drag to pan, right-click drag to rotate ---
         if (mouse != null)
@@ -52,9 +120,14 @@ public class CameraController : MonoBehaviour
             // Start middle drag
             if (mouse.middleButton.wasPressedThisFrame)
             {
-                isMiddleDragging = true;
-                lastMousePosition = mouse.position.ReadValue();
+                // Disable panning when following a unit
+                if (followTarget == null)
+                {
+                    isMiddleDragging = true;
+                    lastMousePosition = mouse.position.ReadValue();
+                }
             }
+
             // End middle drag
             if (mouse.middleButton.wasReleasedThisFrame)
             {
@@ -67,14 +140,15 @@ public class CameraController : MonoBehaviour
                 isRightDragging = true;
                 lastMousePosition = mouse.position.ReadValue();
             }
+
             // End right drag
             if (mouse.rightButton.wasReleasedThisFrame)
             {
                 isRightDragging = false;
             }
 
-            // Middle drag: pan camera target
-            if (isMiddleDragging && mouse.middleButton.isPressed)
+            // Middle drag: pan camera target (only if not following)
+            if (isMiddleDragging && mouse.middleButton.isPressed && followTarget == null)
             {
                 Vector2 current = mouse.position.ReadValue();
                 Vector2 delta = current - lastMousePosition;
@@ -119,22 +193,29 @@ public class CameraController : MonoBehaviour
                 movementSpeed = nomralSpeed;
             }
 
-            if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
-                direction += transform.forward;
-            if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
-                direction -= transform.forward;
-            if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
-                direction -= transform.right;
-            if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
-                direction += transform.right;
+            // Only allow WASD panning when not following a target
+            if (followTarget == null)
+            {
+                if (keyboard.wKey.isPressed || keyboard.upArrowKey.isPressed)
+                    direction += transform.forward;
+                if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed)
+                    direction -= transform.forward;
+                if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed)
+                    direction -= transform.right;
+                if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed)
+                    direction += transform.right;
 
-            if (direction != Vector3.zero)
-                newPosition += direction.normalized * movementSpeed;
+                if (direction != Vector3.zero)
+                    newPosition += direction.normalized * movementSpeed;
+            }
 
+            // Rotation keys allowed even when following
             if (keyboard.qKey.isPressed)
                 newRotation *= Quaternion.Euler(Vector3.up * rotationAmount);
             if (keyboard.eKey.isPressed)
                 newRotation *= Quaternion.Euler(Vector3.up * -rotationAmount);
+
+            // Zoom keys allowed even when following
             if (keyboard.rKey.isPressed)
             {
                 newZoom += zoomAmount;
@@ -146,26 +227,32 @@ public class CameraController : MonoBehaviour
                 newZoom = ClampZoom(newZoom);
             }
         }
-        //Scroll wheel zoom
 
-        float scroll = Mouse.current.scroll.y.ReadValue();
-        // Stop zooming if hovering over UI
-        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-            scroll = 0f;
-
-
-        if (scroll != 0)
+        // Scroll wheel zoom
+        if (mouse != null)
         {
-            float zoomStrength = Mathf.Lerp(zoomAmount.magnitude * 0.5f, zoomAmount.magnitude * 2f, Mathf.InverseLerp(5f, 50f, newZoom.magnitude));
-            newZoom += zoomAmount * scroll * zoomStrength * 1f;
-            newZoom = ClampZoom(newZoom);
+            float scroll = mouse.scroll.y.ReadValue();
+
+            // Stop zooming if hovering over UI
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+                scroll = 0f;
+
+            if (scroll != 0)
+            {
+                float zoomStrength = Mathf.Lerp(
+                    zoomAmount.magnitude * 0.5f,
+                    zoomAmount.magnitude * 2f,
+                    Mathf.InverseLerp(5f, 50f, newZoom.magnitude)
+                );
+                newZoom += zoomAmount * scroll * zoomStrength * 1f;
+                newZoom = ClampZoom(newZoom);
+            }
         }
 
-
+        // Apply smoothed transform updates
         transform.position = Vector3.Lerp(transform.position, newPosition, movementTime * Time.deltaTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, newRotation, movementTime * Time.deltaTime);
         Camera.main.transform.localPosition = Vector3.Lerp(Camera.main.transform.localPosition, newZoom, movementTime * Time.deltaTime);
-
     }
 
     public void SetCameraLimits(float minX, float maxX, float minZ, float maxZ)
@@ -182,6 +269,4 @@ public class CameraController : MonoBehaviour
         zoom.z = Mathf.Clamp(zoom.z, -500f, -50f);
         return zoom;
     }
-
-
 }

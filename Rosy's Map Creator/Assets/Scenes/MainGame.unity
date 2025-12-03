@@ -201,8 +201,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2014518786}
   m_HandleRect: {fileID: 2014518785}
   m_Direction: 2
-  m_Value: 0.9998627
-  m_Size: 0.2302505
+  m_Value: 0.000009235203
+  m_Size: 0.20889467
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -402,8 +402,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1686585712}
   m_HandleRect: {fileID: 1686585711}
   m_Direction: 0
-  m_Value: 2.016129
-  m_Size: 0.99999744
+  m_Value: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -682,7 +682,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0030741224, y: 0.1415494}
+  m_AnchoredPosition: {x: 0.0030741224, y: 981.43}
   m_SizeDelta: {x: 0, y: 1275}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &170943584
@@ -2184,8 +2184,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1288051728}
   m_HandleRect: {fileID: 1288051727}
   m_Direction: 2
-  m_Value: 0.9998627
-  m_Size: 0.2302505
+  m_Value: 0.000009235203
+  m_Size: 0.20889467
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2673,8 +2673,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1616689070}
   m_HandleRect: {fileID: 1616689069}
   m_Direction: 0
-  m_Value: 2.016129
-  m_Size: 0.99999744
+  m_Value: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3769,8 +3769,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1784392921}
   m_HandleRect: {fileID: 1784392920}
   m_Direction: 2
-  m_Value: 0.9998627
-  m_Size: 0.2302505
+  m_Value: 0.000009235203
+  m_Size: 0.20889467
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4437,8 +4437,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 703897179}
   m_HandleRect: {fileID: 703897178}
   m_Direction: 0
-  m_Value: 2.016129
-  m_Size: 0.99999744
+  m_Value: 1
+  m_Size: 0.9999998
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -4513,7 +4513,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0030741224, y: 0.1415494}
+  m_AnchoredPosition: {x: 0.0030741224, y: 981.43}
   m_SizeDelta: {x: 0, y: 1275}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1154922728
@@ -4707,7 +4707,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.0030741224, y: 0.1415494}
+  m_AnchoredPosition: {x: 0.0030741224, y: 981.43}
   m_SizeDelta: {x: 0, y: 1275}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1181276158
@@ -4939,8 +4939,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 627459756}
   m_HandleRect: {fileID: 627459755}
   m_Direction: 0
-  m_Value: 1
-  m_Size: 1
+  m_Value: -0.29605263
+  m_Size: 0.9999938
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5095,6 +5095,10 @@ MonoBehaviour:
   zoomAmount: {x: 0, y: -2, z: 2}
   dragSpeed: 2
   dragRotateSpeed: 1
+  selectableLayers:
+    serializedVersion: 2
+    m_Bits: 128
+  clickToToggleFollow: 1
   newPosition: {x: 0, y: 0, z: 0}
   newRotation: {x: 0, y: 0, z: 0, w: 0}
   newZoom: {x: 0, y: 0, z: 0}
@@ -5147,7 +5151,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0.008505596, y: 6.451566}
+  m_AnchoredPosition: {x: 0.008505596, y: 6.4240966}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!1 &1288051726
@@ -5581,7 +5585,7 @@ MonoBehaviour:
   summerMaterialRef: {fileID: 2100000, guid: 958ae798dc002f743b86fc6da43e9c83, type: 2}
   fallMaterialRef: {fileID: 2100000, guid: 55e6e9d4e1e9701409e76f8921510254, type: 2}
   winterMaterialRef: {fileID: 2100000, guid: 7d450b3ecd35a814c98d1cc0207cc250, type: 2}
-  startingSeason: 2
+  startingSeason: 1
   tabManager: {fileID: 910333243}
 --- !u!4 &1418295842
 Transform:
@@ -6429,8 +6433,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1475406086}
   m_HandleRect: {fileID: 1475406085}
   m_Direction: 2
-  m_Value: -0.0019127356
-  m_Size: 0.9784446
+  m_Value: 0.000066436354
+  m_Size: 0.8878068
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7656,9 +7660,13 @@ MonoBehaviour:
   currentSeason: 1
   currentPlacementMode: 0
   deleteHoverMaterial: {fileID: 2100000, guid: 2920b86e14d0aa34087583ea5289aa05, type: 2}
+  selectionHoverMaterial: {fileID: 2100000, guid: e1abff07f0fbbf347a36a0f9e270b742, type: 2}
+  isUnitSelected: 0
   buildingYOffsetFactor: 0.5
   worldState: {fileID: 1687343602}
   placedObjects: []
+  currentSelection: {fileID: 0}
+  previousSelection: {fileID: 0}
 --- !u!4 &1865284015
 Transform:
   m_ObjectHideFlags: 0

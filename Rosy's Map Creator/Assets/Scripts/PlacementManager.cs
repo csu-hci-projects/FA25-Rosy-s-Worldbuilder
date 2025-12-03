@@ -6,6 +6,8 @@ using System;
 using Unity.VisualScripting;
 using Unity.Mathematics;
 using UnityEngine.XR;
+using System.IO;
+using System.Collections.Generic;
 
 public enum PlacementMode
 {
@@ -24,6 +26,11 @@ public class PlacementManager : MonoBehaviour
     [SerializeField] private PlacementMode currentPlacementMode = PlacementMode.Place;
     [Header("Delete Mode Highlight")]
     [SerializeField] private Material deleteHoverMaterial;
+    [Header("Selection Mode Highlight")]
+    [SerializeField] private Material selectionHoverMaterial;
+    public bool isUnitSelected = false;
+
+    List<HexTileData> path = new List<HexTileData>();
 
     private Renderer lastHoverRenderer;
     private Material lastOriginalMaterial;
@@ -92,6 +99,9 @@ public class PlacementManager : MonoBehaviour
         }
     }
 
+    public GameObject currentSelection = null;
+    public GameObject previousSelection = null;
+
     void Update()
     {
         HandleModeChange();
@@ -120,29 +130,19 @@ public class PlacementManager : MonoBehaviour
         Vector3Int cellPosition = hexGrid.WorldToCell(hit.point);
         Vector3 cellPositionWorld = hexGrid.GetCellCenterWorld(cellPosition);
         Vector3 previewPos = GetPlacementPosition(hit, cellPositionWorld);
+
+
         hexPreview.transform.position = previewPos;
         if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
         {
             hexPreview.transform.Rotate(0f, 60f, 0f);
         }
-        HandleDeleteHover(hit);
+        HandleMouseHover(hit);
         if (mouse.leftButton.wasPressedThisFrame)
         {
             if (currentPlacementMode == PlacementMode.Place && tilePrefab != null)
             {
-                GameObject placed = Instantiate(tilePrefab, previewPos, hexPreview.transform.rotation);
-                if (worldState != null)
-                {
-                    placed.transform.SetParent(worldState.transform, true);
-                }
-                int gridX = cellPosition.x;
-                int gridZ = cellPosition.y; 
-                int layerIndex = Mathf.RoundToInt(previewPos.y * 2 - 1);
-
-                TileData tileData = placed.AddComponent<TileData>();
-                tileData.SetTileCoordinates(new Vector3(gridX, layerIndex, gridZ));
-
-                placedObjects.Add(placed);
+                HandlePlacement(cellPosition, previewPos, hit);
             }
             else if (currentPlacementMode == PlacementMode.Delete)
             {
@@ -151,12 +151,187 @@ public class PlacementManager : MonoBehaviour
                     Debug.Log("Deleting object: " + hit.collider.gameObject.name);
                     GameObject toDelete = hit.collider.gameObject;
                     placedObjects.Remove(toDelete);
+                    worldState.GetComponent<WorldStateManager>()?.UnregisterHexTile(toDelete.GetComponent<HexTileData>());
                     Destroy(toDelete);
                 }
+            }
+            else if (currentPlacementMode == PlacementMode.Selection)
+            {
+                bool flowControl = HandleSelectionChange(hit);
+                if (!flowControl)
+                {
+                    return;
+                }
+
             }
         }
     }
 
+    private bool HandleSelectionChange(RaycastHit hit)
+    {
+        previousSelection = currentSelection;
+        currentSelection = hit.collider.gameObject;
+
+        if (currentSelection.CompareTag("HexTile") && previousSelection.CompareTag("Units"))
+        {
+            return FindPathFromSelection();
+        }
+
+        if (currentSelection.CompareTag("Units") && previousSelection != currentSelection)
+        {
+            Debug.Log("Selecting unit: " + currentSelection.name);
+            currentSelection.GetComponent<UnitController>()?.Selected();
+        }
+
+        if (currentSelection == previousSelection && currentSelection.CompareTag("Units"))
+        {
+            Debug.Log("Deselecting unit: " + currentSelection.name);
+            currentSelection.GetComponent<UnitController>()?.Deselect();
+            currentSelection = null;
+        }
+
+        return true;
+    }
+
+    private bool FindPathFromSelection()
+    {
+        HexTileData targetTileCoords = currentSelection.GetComponent<HexTileData>();
+        HexTileData originTileCoords = previousSelection.GetComponent<UnitController>().GetParentHexTileData();
+        if (targetTileCoords == null)
+        {
+            Debug.Log("Target tile coordinates not found.");
+            return false;
+        }
+        if (originTileCoords == null)
+        {
+            Debug.Log("Origin tile coordinates not found.");
+            return false;
+        }
+        Debug.Log("Finding path from " + originTileCoords.GetTileCoordinates() + " to " + targetTileCoords.GetTileCoordinates());
+        path = Pathfinder.FindPath(originTileCoords, targetTileCoords);
+        foreach (HexTileData step in path)
+        {
+            Debug.Log("Path step: " + step.GetTileCoordinates());
+        }
+        previousSelection.GetComponent<UnitController>()?.SetPath(path);
+        previousSelection.GetComponent<UnitController>()?.Deselect();
+        currentSelection = null;
+        previousSelection = null;
+
+        return false;
+    }
+
+    private void HandlePlacement(Vector3Int cellPosition, Vector3 previewPos, RaycastHit hit)
+    {
+        bool flowControl = false;
+        switch (tilePrefab.tag)
+        {
+            case "HexTile":
+                PlaceTileAtPosition(cellPosition, previewPos);
+                break;
+            case "Buildings":
+                flowControl = PlaceObjectOnTile(previewPos, hit);
+                if (!flowControl)
+                {
+                    return;
+                }
+                break;
+            case "Decorations":
+                flowControl = PlaceObjectOnTile(previewPos, hit);
+                if (!flowControl)
+                {
+                    return;
+                }
+                break;
+            case "Units":
+                flowControl = PlaceObjectOnTile(previewPos, hit);
+                if (!flowControl)
+                {
+                    return;
+                }
+                break;
+            default:
+                Debug.Log("Placing object at position: " + previewPos);
+                break;
+        }
+
+
+
+    }
+
+    private void PlaceTileAtPosition(Vector3Int cellPosition, Vector3 previewPos)
+    {
+        Debug.Log("Placing tile at position: " + previewPos);
+
+        GameObject placed = Instantiate(tilePrefab, previewPos, hexPreview.transform.rotation);
+
+        // Parent under worldState if assigned
+        if (worldState != null)
+        {
+            placed.transform.SetParent(worldState.transform, true);
+        }
+
+        // Grid coords (assuming x = column, y = row → stored as x,z in tile coords)
+        int gridX = cellPosition.x;
+        int gridZ = cellPosition.y;
+        Debug.Log("Placing at grid coordinates: (" + gridX + ", " + gridZ + ")");
+
+        // Layer index – if you just want 0,1,2... per height step, you can simplify this
+        int layerIndex = Mathf.RoundToInt(previewPos.y * 2 - 1);
+        // or: int layerIndex = Mathf.RoundToInt(previewPos.y);
+
+        // Make sure we only have ONE HexTileData on the object
+        HexTileData tileData = placed.GetComponent<HexTileData>();
+        if (tileData == null)
+        {
+            tileData = placed.AddComponent<HexTileData>();
+        }
+
+        // Store logical grid coords in the tile
+        tileData.SetTileCoordinates(new Vector3(gridX, layerIndex, gridZ));
+
+        // Cache WorldStateManager and guard against null worldState
+        if (worldState != null)
+        {
+            WorldStateManager wsm = worldState.GetComponent<WorldStateManager>();
+            if (wsm != null)
+            {
+                wsm.RegisterHexTile(tileData);
+                wsm.PrintHexTiles();
+                wsm.PrintNeighborsOfTile(tileData);
+            }
+        }
+
+        placedObjects.Add(placed);
+    }
+
+    private bool PlaceObjectOnTile(Vector3 previewPos, RaycastHit hit)
+    {
+        if (hit.collider.CompareTag("HexTile"))
+        {
+            Debug.Log("Placing object on tile: " + hit.collider.gameObject.name);
+            if (hit.collider.GetComponent<HexTileData>().getCurrentPlaceableObject() == null
+            && hit.collider.GetComponent<HexTileData>().isOcupied == false
+            && hit.collider.GetComponent<HexTileData>().isTraversable)
+            {
+                GameObject placedObject = Instantiate(tilePrefab, previewPos, hexPreview.transform.rotation);
+                placedObject.transform.SetParent(hit.collider.transform, true);
+                placedObject.transform.localPosition = Vector3.zero;
+                hit.collider.GetComponent<HexTileData>().setCurrentPlaceableObject(placedObject);
+                hit.collider.GetComponent<HexTileData>().isOcupied = true;
+                placedObject.GetComponent<UnitController>()?.SetTileData(hit.collider.GetComponent<HexTileData>());
+                placedObjects.Add(placedObject);
+                return false;
+            }
+            else
+            {
+                Debug.Log("Cannot place unit: Tile is already occupied.");
+                return false;
+            }
+        }
+
+        return true;
+    }
 
     private Vector3 GetPlacementPosition(RaycastHit hit, Vector3 cellCenter)
     {
@@ -185,22 +360,34 @@ public class PlacementManager : MonoBehaviour
         return pos;
     }
 
-    private void HandleDeleteHover(RaycastHit hit)
+    private void HandleMouseHover(RaycastHit hit)
     {
-        if (currentPlacementMode != PlacementMode.Delete)
+
+        if (currentPlacementMode != PlacementMode.Delete && currentPlacementMode != PlacementMode.Selection)
         {
             ClearLastHover();
             return;
         }
 
-        if (deleteHoverMaterial == null)
+
+        Material hoverMaterial = null;
+        if (currentPlacementMode == PlacementMode.Delete)
+        {
+            hoverMaterial = deleteHoverMaterial;
+        }
+        else if (currentPlacementMode == PlacementMode.Selection)
+        {
+            hoverMaterial = selectionHoverMaterial;
+        }
+
+        if (hoverMaterial == null)
         {
             ClearLastHover();
             return;
         }
 
-        bool canDelete = hit.collider != null && (hit.collider.CompareTag("HexTile") || hit.collider.CompareTag("Buildings") || hit.collider.CompareTag("Decorations") || hit.collider.CompareTag("Units"));
-        if (!canDelete)
+        bool canHover = hit.collider != null && (hit.collider.CompareTag("HexTile") || hit.collider.CompareTag("Buildings") || hit.collider.CompareTag("Decorations") || hit.collider.CompareTag("Units"));
+        if (!canHover)
         {
             ClearLastHover();
             return;
@@ -218,7 +405,7 @@ public class PlacementManager : MonoBehaviour
             ClearLastHover();
             lastHoverRenderer = rend;
             lastOriginalMaterial = rend.material;
-            rend.material = deleteHoverMaterial;
+            rend.material = hoverMaterial;
         }
     }
 
@@ -237,4 +424,16 @@ public class PlacementManager : MonoBehaviour
         print("Changing mode to: " + mode);
         currentPlacementMode = (PlacementMode)mode;
     }
+
+    void OnDrawGizmos()
+    {
+        if (path != null)
+        {
+            foreach (var step in path)
+            {
+                Gizmos.DrawCube(step.transform.position + new Vector3(0, .5f, .5f), Vector3.one * 0.5f);
+            }
+        }
+    }
+
 }

@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.InputSystem.Interactions;
 
-public class SaveHandler : MonoBehaviour
+public class WorldStateManager : MonoBehaviour
 {
     [Header("World Root Reference")]
     [SerializeField] private GameObject worldState;
@@ -258,6 +259,137 @@ public class SaveHandler : MonoBehaviour
 #else
             Destroy(c);
 #endif
+        }
+    }
+
+    // Assumes: HexTileData has GetTileCoordinates() and a List<HexTileData> neighbors + AddNeighbor(HexTileData).
+
+    // Dictionary of all tiles in the world
+    [SerializeField] public Dictionary<Vector3, HexTileData> hexTiles = new Dictionary<Vector3, HexTileData>();
+
+    // Offsets for your odd/even row hex layout
+    private static readonly Vector3[] evenRowOffsets =
+    {
+    new Vector3(+1, 0, 0),
+    new Vector3(0, 0, +1),
+    new Vector3(-1, 0, +1),
+    new Vector3(-1, 0, 0),
+    new Vector3(-1, 0, -1),
+    new Vector3(0, 0, -1)
+};
+
+    private static readonly Vector3[] oddRowOffsets =
+    {
+    new Vector3(+1, 0, 0),
+    new Vector3(+1, 0, +1),
+    new Vector3(0, 0, +1),
+    new Vector3(-1, 0, 0),
+    new Vector3(0, 0, -1),
+    new Vector3(+1, 0, -1)
+};
+
+    private bool IsEvenRow(Vector3 coords)
+    {
+        // Use whatever axis is your "row"; here you're using Z
+        return ((int)coords.z % 2) == 0;
+    }
+
+    public void RegisterHexTile(HexTileData tile)
+    {
+        if (tile == null) return;
+
+        Vector3 coords = tile.GetTileCoordinates();
+        hexTiles[coords] = tile; // add or replace
+
+        // Keep neighbor links up to date
+        UpdateNeighborsForTile(tile);
+    }
+
+    public HexTileData GetHexTileAtCoordinates(Vector3 coords)
+    {
+        hexTiles.TryGetValue(coords, out HexTileData tile);
+        return tile;
+    }
+
+    public void UnregisterHexTile(HexTileData tile)
+    {
+        if (tile == null) return;
+
+        Vector3 coords = tile.GetTileCoordinates();
+
+        // Remove this tile from all its neighbors' neighbor lists
+        foreach (HexTileData neighbor in GetNeighborsForCoords(coords))
+        {
+            neighbor.neighbors.Remove(tile);
+        }
+
+        hexTiles.Remove(coords);
+    }
+
+    // -------------------
+    //  Neighbors
+    // -------------------
+
+    private List<HexTileData> GetNeighborsForCoords(Vector3 coords)
+    {
+        List<HexTileData> neighbors = new List<HexTileData>(6);
+        Vector3[] offsets = IsEvenRow(coords) ? evenRowOffsets : oddRowOffsets;
+
+        foreach (Vector3 offset in offsets)
+        {
+            Vector3 neighborCoords = coords + offset;
+            if (hexTiles.TryGetValue(neighborCoords, out HexTileData neighborTile))
+            {
+                neighbors.Add(neighborTile);
+            }
+        }
+
+        return neighbors;
+    }
+
+    public List<HexTileData> UpdateNeighborsForTile(HexTileData tile)
+    {
+        if (tile == null) return null;
+
+        Vector3 coords = tile.GetTileCoordinates();
+        List<HexTileData> neighbors = GetNeighborsForCoords(coords);
+
+        // Clear and rebuild this tile's neighbor list
+        tile.neighbors.Clear();
+
+        foreach (HexTileData neighbor in neighbors)
+        {
+            tile.AddNeighbor(neighbor);
+
+            // Make sure the neighbor also knows about this tile (bidirectional)
+            if (!neighbor.neighbors.Contains(tile))
+            {
+                neighbor.AddNeighbor(tile);
+            }
+        }
+
+        return neighbors;
+    }
+
+    
+    public void PrintHexTiles()
+    {
+        foreach (var kvp in hexTiles)
+        {
+            Debug.Log($"Tile \"{kvp.Value.name}\" at: {kvp.Key}");
+        }
+    }
+
+    public void PrintNeighborsOfTile(HexTileData tile)
+    {
+        if (tile == null) return;
+
+        List<HexTileData> neighbors = GetNeighborsForCoords(tile.GetTileCoordinates());
+
+        Debug.Log("Neighbors of tile at " + tile.GetTileCoordinates() + ":");
+        foreach (HexTileData neighbor in neighbors)
+        {
+            Debug.Log(" - Neighbor at " + neighbor.GetTileCoordinates());
         }
     }
 }
