@@ -6,6 +6,7 @@ using UnityEngine.InputSystem.Interactions;
 
 public class WorldStateManager : MonoBehaviour
 {
+
     [Header("World Root Reference")]
     [SerializeField] private GameObject worldState;
 
@@ -20,6 +21,7 @@ public class WorldStateManager : MonoBehaviour
     [SerializeField] private Material winterMaterial;
     private Dictionary<string, GameObject> prefabLookup;
 
+
     [Serializable]
     public class WorldObjectData
     {
@@ -30,7 +32,11 @@ public class WorldStateManager : MonoBehaviour
         public Vector3 scale;
         public string parentPath;
         public string season;
+
+        // NEW: only filled if this object has a HexTileData component
+        public HexTileSaveData hexTileData;
     }
+
 
     [Serializable]
     public class WorldSaveData
@@ -61,7 +67,13 @@ public class WorldStateManager : MonoBehaviour
             }
         }
     }
-
+    public void RebuildAllNeighbors()
+    {
+        foreach (var kvp in hexTiles)
+        {
+            UpdateNeighborsForTile(kvp.Value);
+        }
+    }
     [ContextMenu("Save World State")]
     public void SaveWorldState()
     {
@@ -105,12 +117,42 @@ public class WorldStateManager : MonoBehaviour
             parentPath = GetRelativePath(t.parent, root),
             season = DetectSeason(t)
         };
+
+        // --- NEW: if this object is a hex tile, save its fields ---
+        HexTileData hex = t.GetComponent<HexTileData>();
+        if (hex != null)
+        {
+            objData.hexTileData = new HexTileSaveData
+            {
+                tileCoords = hex.GetTileCoordinates(),
+                // adjust these field names to match your HexTileData script:
+                isTraversable = hex.isTraversable,
+                hasBuilding = hex.hasBuilding,
+                isOccupied = hex.isOccupied,
+                isWater = hex.isWater,
+                movementCost = hex.movementCost,
+                currentPlaceableName = hex.currentPlaceableObject != null
+                    ? hex.currentPlaceableObject.name.Replace("(Clone)", "").Trim()
+                    : null
+            };
+        }
+
         data.objects.Add(objData);
+
+        // Recurse into children, BUT if this is a hex tile, skip the placed object
         foreach (Transform c in t)
         {
+            if (hex != null && hex.currentPlaceableObject != null &&
+                c.gameObject == hex.currentPlaceableObject)
+            {
+                // don’t save the placeable separately – it’s saved via hexTileData
+                continue;
+            }
+
             AddRecursive(c, data, root);
         }
     }
+
 
     private string GetRelativePath(Transform current, Transform root)
     {
@@ -133,6 +175,8 @@ public class WorldStateManager : MonoBehaviour
             Debug.LogWarning("SaveHandler: No save file found to load.");
             return;
         }
+
+        hexTiles.Clear();
 
         string json = File.ReadAllText(SaveFilePath);
         var data = JsonUtility.FromJson<WorldSaveData>(json);
@@ -178,11 +222,55 @@ public class WorldStateManager : MonoBehaviour
                 ApplySeasonMaterial(instance.transform, obj.season);
             }
 
+            // --- NEW: if this is a saved hex tile, restore its data + placed child ---
+            if (obj.hexTileData != null)
+            {
+                Debug.Log($"Restoring HexTileData for '{obj.name}'");
+                HexTileData hex = instance.GetComponent<HexTileData>();
+                if (hex == null)
+                {
+                    Debug.LogWarning($"Loaded object '{obj.name}' does not have HexTileData component; adding one.");
+                    hex = instance.AddComponent<HexTileData>();
+                }
+                if (hex != null)
+                {
+
+                    hex.SetTileCoordinates(obj.hexTileData.tileCoords);
+
+
+                    hex.isTraversable = obj.hexTileData.isTraversable;
+                    hex.hasBuilding = obj.hexTileData.hasBuilding;
+                    hex.isOccupied = obj.hexTileData.isOccupied;
+                    hex.isWater = obj.hexTileData.isWater;
+                    hex.movementCost = obj.hexTileData.movementCost;
+
+
+                    if (!string.IsNullOrEmpty(obj.hexTileData.currentPlaceableName) &&
+                        prefabLookup.TryGetValue(obj.hexTileData.currentPlaceableName,
+                                                 out GameObject placeablePrefab))
+                    {
+                        GameObject placeableInstance = Instantiate(placeablePrefab, instance.transform);
+                        placeableInstance.name = obj.hexTileData.currentPlaceableName;
+                        hex.currentPlaceableObject = placeableInstance;
+                    }
+
+
+                    RegisterHexTile(hex);
+                    PrintHexTiles();           
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"Loaded object '{obj.name}' does not have HexTileData component.");
+            }
+
+
             string fullPath = string.IsNullOrEmpty(obj.parentPath) ? obj.name : obj.parentPath + "/" + obj.name;
             createdByPath[fullPath] = instance.transform;
         }
 
         Debug.Log($"World state loaded. Objects recreated: {data.objects.Count}");
+        RebuildAllNeighbors();
     }
 
     private Transform CreateHierarchyForPath(string path, Dictionary<string, Transform> cache)
@@ -244,11 +332,16 @@ public class WorldStateManager : MonoBehaviour
             Debug.LogError("SaveHandler: worldState reference not assigned.");
             return;
         }
+
+        hexTiles.Clear();   // <-- add this line
+
         var children = new List<GameObject>();
         foreach (Transform child in worldState.transform)
         {
             children.Add(child.gameObject);
         }
+
+
         foreach (var c in children)
         {
 #if UNITY_EDITOR
@@ -371,7 +464,7 @@ public class WorldStateManager : MonoBehaviour
         return neighbors;
     }
 
-    
+
     public void PrintHexTiles()
     {
         foreach (var kvp in hexTiles)
@@ -392,4 +485,18 @@ public class WorldStateManager : MonoBehaviour
             Debug.Log(" - Neighbor at " + neighbor.GetTileCoordinates());
         }
     }
+}
+
+[Serializable]
+public class HexTileSaveData
+{
+    public Vector3 tileCoords;
+    public bool isTraversable;
+    public bool hasBuilding;
+    public bool isOccupied;
+    public bool isWater;
+    public float movementCost;
+
+    // prefab name of the placed object, without "(Clone)"
+    public string currentPlaceableName;
 }

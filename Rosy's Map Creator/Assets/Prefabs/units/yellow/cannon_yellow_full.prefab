@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: -6074351325550591719}
+  - component: {fileID: -6223905239388685204}
   m_Layer: 6
   m_Name: cannon_yellow_full
-  m_TagString: HexTile
+  m_TagString: Units
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -110,6 +111,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 3128325187509300064, guid: 779ebcb3687e6924a96f6744e2f9c5f6, type: 3}
+--- !u!114 &-6223905239388685204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149155446097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5de923e2fd19d94b938113af2a71e02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &2368578492774508656
 GameObject:
   m_ObjectHideFlags: 0

@@ -98,9 +98,10 @@ GameObject:
   - component: {fileID: -5754084199372789682}
   - component: {fileID: -7511558181221131132}
   - component: {fileID: -7322129358910751288}
+  - component: {fileID: -6449176866980200775}
   m_Layer: 6
   m_Name: cart_red_accent
-  m_TagString: HexTile
+  m_TagString: Units
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -197,6 +198,19 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 3538063598441650045, guid: 9fbb24a9eea27c4479a95e1e97a7e19b, type: 3}
+--- !u!114 &-6449176866980200775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 919132149155446097}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b5de923e2fd19d94b938113af2a71e02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  lineMaterial: {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
 --- !u!1 &8909898197893469105
 GameObject:
   m_ObjectHideFlags: 0

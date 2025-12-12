@@ -134,7 +134,7 @@ public class UnitController : MonoBehaviour
                 gameObject.transform.SetParent(currentTile.GetParentObject().transform, false);
                 SetParent(currentTile.GetParentObject());
                 currentTile.setCurrentPlaceableObject(gameObject);
-                currentTile.setIsOcupied(true);
+                currentTile.setIsOccupied(true);
             }
             gotPath = false;
             UpdateLineRenderer(path);
@@ -155,9 +155,9 @@ public class UnitController : MonoBehaviour
             gameObject.transform.SetParent(nextTile.GetParentObject().transform, false);
             SetParent(nextTile.GetParentObject());
             nextTile.setCurrentPlaceableObject(gameObject);
-            nextTile.setIsOcupied(true);
+            nextTile.setIsOccupied(true);
             currentTile.setCurrentPlaceableObject(null);
-            currentTile.setIsOcupied(false);
+            currentTile.setIsOccupied(false);
             gotPath = true;
             path.RemoveAt(0);
 

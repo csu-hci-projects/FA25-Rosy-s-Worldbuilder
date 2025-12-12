@@ -228,6 +228,7 @@ public class PlacementManager : MonoBehaviour
         {
             case "HexTile":
                 PlaceTileAtPosition(cellPosition, previewPos);
+                playSound();
                 break;
             case "Buildings":
                 flowControl = PlaceObjectOnTile(previewPos, hit);
@@ -257,6 +258,15 @@ public class PlacementManager : MonoBehaviour
 
 
 
+    }
+
+    private void playSound()
+    {
+        AudioSource audioSource = GetComponent<AudioSource>();
+        if (audioSource != null && audioSource.clip != null)
+        {
+            audioSource.PlayOneShot(audioSource.clip);
+        }
     }
 
     private void PlaceTileAtPosition(Vector3Int cellPosition, Vector3 previewPos)
@@ -311,16 +321,17 @@ public class PlacementManager : MonoBehaviour
         {
             Debug.Log("Placing object on tile: " + hit.collider.gameObject.name);
             if (hit.collider.GetComponent<HexTileData>().getCurrentPlaceableObject() == null
-            && hit.collider.GetComponent<HexTileData>().isOcupied == false
+            && hit.collider.GetComponent<HexTileData>().isOccupied == false
             && hit.collider.GetComponent<HexTileData>().isTraversable)
             {
                 GameObject placedObject = Instantiate(tilePrefab, previewPos, hexPreview.transform.rotation);
                 placedObject.transform.SetParent(hit.collider.transform, true);
                 placedObject.transform.localPosition = Vector3.zero;
                 hit.collider.GetComponent<HexTileData>().setCurrentPlaceableObject(placedObject);
-                hit.collider.GetComponent<HexTileData>().isOcupied = true;
+                hit.collider.GetComponent<HexTileData>().isOccupied = true;
                 placedObject.GetComponent<UnitController>()?.SetTileData(hit.collider.GetComponent<HexTileData>());
                 placedObjects.Add(placedObject);
+                playSound();
                 return false;
             }
             else

@@ -10,11 +10,11 @@ public class HexTileData : MonoBehaviour
 
     public bool isTraversable = true;
     public bool hasBuilding = false;
-    public bool isOcupied = false;
+    public bool isOccupied = false;
 
-    public void setIsOcupied(bool occupied)
+    public void setIsOccupied(bool occupied)
     {
-        isOcupied = occupied;
+        isOccupied = occupied;
     }
     public bool isWater = false;
     public float movementCost = 1.0f;
@@ -23,7 +23,7 @@ public class HexTileData : MonoBehaviour
 
     public List<HexTileData> neighbors = new List<HexTileData>();
 
-    public GameObject CurrentPlaceableObject = null;
+    public GameObject currentPlaceableObject = null;
 
     public GameObject GetParentObject()
     {
@@ -51,12 +51,12 @@ public class HexTileData : MonoBehaviour
     }
     public GameObject getCurrentPlaceableObject()
     {
-        return CurrentPlaceableObject;
+        return currentPlaceableObject;
     }
 
     public void setCurrentPlaceableObject(GameObject obj)
     {
-        CurrentPlaceableObject = obj;
+        currentPlaceableObject = obj;
         // obj.transform.SetParent(transform.parent);
     }
 
