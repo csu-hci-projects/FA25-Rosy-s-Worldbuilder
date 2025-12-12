@@ -1,8 +1,5 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Linq;
-using UnityEditor.VersionControl;
 
 public class TabContent : MonoBehaviour
 {

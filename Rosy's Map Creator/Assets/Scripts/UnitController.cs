@@ -119,7 +119,6 @@ public class UnitController : MonoBehaviour
 
     HexTileData currentTile;
     HexTileData nextTile;
-    bool gotPath = false;
     Vector3 targetPosition;
 
     public void HandleMovement()
@@ -136,7 +135,7 @@ public class UnitController : MonoBehaviour
                 currentTile.setCurrentPlaceableObject(gameObject);
                 currentTile.setIsOccupied(true);
             }
-            gotPath = false;
+
             UpdateLineRenderer(path);
         }
         else
@@ -158,7 +157,6 @@ public class UnitController : MonoBehaviour
             nextTile.setIsOccupied(true);
             currentTile.setCurrentPlaceableObject(null);
             currentTile.setIsOccupied(false);
-            gotPath = true;
             path.RemoveAt(0);
 
             UpdateLineRenderer(path);

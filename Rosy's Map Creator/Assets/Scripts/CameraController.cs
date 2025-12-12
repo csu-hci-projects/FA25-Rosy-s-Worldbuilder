@@ -33,8 +33,6 @@ public class CameraController : MonoBehaviour
     public Quaternion newRotation;
     public Vector3 newZoom;
 
-    public CameraLimits cameraLimits = new CameraLimits();
-
     void Start()
     {
         newPosition = transform.position;
@@ -255,13 +253,6 @@ public class CameraController : MonoBehaviour
         Camera.main.transform.localPosition = Vector3.Lerp(Camera.main.transform.localPosition, newZoom, movementTime * Time.deltaTime);
     }
 
-    public void SetCameraLimits(float minX, float maxX, float minZ, float maxZ)
-    {
-        cameraLimits.minX = minX;
-        cameraLimits.maxX = maxX;
-        cameraLimits.minZ = minZ;
-        cameraLimits.maxZ = maxZ;
-    }
 
     private Vector3 ClampZoom(Vector3 zoom)
     {
